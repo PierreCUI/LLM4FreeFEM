@@ -1,0 +1,72 @@
+// This is a template of main loop structure.
+
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "packageName1";
+load "packageName2";
+load "packageName3";
+
+// Define all constants of the program by type variableName = value;. For example,
+real ... = ...;
+int ... = ...;
+real[int] ... = ...;
+int[int] ... = ...;
+
+// Define the mesh according to the problem demands by type meshName = buildFunction(parameters);. For example,
+mesh Th = ...;
+mesh Thf = ...;
+mesh Ths = ...;
+mesh3 Th = ...;
+mesh3 Thf = ...;
+mesh3 Ths = ...;
+// A label will be used a parameter only if it is mentioned in the settings explicitly. Labels that are not mentioned in the training settings are not needed to be defined and passed to the function.
+// A list label must be defined "explicitly" as int[int] labels = [1, 2, 3, ...] before passing to the function.
+
+// Define the FE spaces and mixed spaces. For each variable, a group of FE spaces should be defined. For example, 
+fespace VhX(Th, [...]);  // For X
+fespace VhdeltaX(Th, [...]);  // For X
+fespace VhY(Th, ...);  // For Y
+fespace VhdeltaY(Th, ...);  // For Y
+VhX [X1, X2, ...] = ...;  // VhX<complex> [X1, X2, ...] = ...; if complex. The initial value must be given at this definition place. It is not allowed to give the values later.
+VhX [incX1, incX2, ...];  // VhX<complex> [incX1, incX2, ...]; if complex.
+VhY Y = ...;  // VhY<complex> Y = ...; if complex. The initial value must be given at this definition place. It is not allowed to give the values later.
+VhY incY;  // VhY<complex> incY; if complex.
+VhdeltaX [deltaX1, deltaX2, ...];  // VhdeltaX<complex> [deltaX1, deltaX2, ...]; if complex.
+VhdeltaY deltaY;  // VhdeltaY<complex> deltaY; if complex.
+// If multiple spaces are defined, a mixed space is normally used for the following calculation.
+// If only one space is defined, don't define the mixed space.
+fespace Ch = <VhX*VhY>;  // Define the mixed space(s) by multipling the original spaces by "<>".
+fespace Cht = <VhdeltaX*VhdeltaY>;  // Define the mixed space(s) by multipling the original spaces by "<>".
+
+// Include the files from ./include folder.
+include "include/...Newton.edp"
+include "include/...Residual.edp"
+
+// Solve the problem.
+// For loop is not necessary if the problem can be solved within one step. Don't write a for loop of only one step.
+for (i = 0; i < maxIterSize; i += iterStepSize)
+{
+	// Envolve other codes if they are necessary for the calculation.
+	matrix A = ...Newton(Ch, Cht);  // matrix<complex> A = ...Newton(Ch, Cht); if complex.
+	set(A, solver=sparsesolver);
+	real[int] rhs = ...Residual(0, Cht);  // complex[int] rhs = ...Residual(0, Cht); if complex.
+	real[int] sol = A^-1 * rhs;  // complex[int] sol = A^-1 * rhs;.
+	[incX1[], incY[]] = sol;  // It is forbidden to have incX2[] here, because it is done "along with incX1[]" due to FreeFEM grammar, which packages the information of X1, X2, X3 all in X1. The [] must be maintained even if only one variable included, for example, [incX] = sol. It is strictly forbidden to omit the [] here.
+	X1[] -= incX1[];  
+	// It is forbidden to have X2[] -= incX2[] here, because it is done "along with X1[] -= incX1[]" due to FreeFEM grammar, which packages the information of X1, X2, X3 all in X1.
+	// The update must be done one by one. It is forbidden to have [X1[], Y[]] -= [incX1[], incY] because it is not allowed by FreeFEM grammar.
+	Y[] -= incY[];
+}
+
+// Save the results. By default, only save once in the end. 
+// VhX XRe = real(X); if complex.
+// VhX XIm = imag(X); if complex.
+string DataNameTh = "variableNames";  // string DataNameTh = "variableNamesRe variableNamesIm"; if complex.
+// Use the exact letter of variable directly for the name.
+int[int] OrderTh = [variableOrders];  // int[int] OrderTh = [variableOrdersRe, variableOrdersIm]; if complex.
+// iovtk must be loaded into FreeFEM at the beginning to use savevtk function.
+// It is no need to build the folder. They are already built by other codes.
+savevtk("results/....vtu", meshName, variableName, dataname=DataNameTh, order=OrderTh);  // savevtk("results/....vtu", meshName, variableNameRe, variableNameIm, dataname=DataNameTh, order=OrderTh); if complex.
+cout << "Total Runtime:" << clock() - timeStart << endl;

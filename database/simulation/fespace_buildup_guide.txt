@@ -1,0 +1,29 @@
+You follow the following steps to define the field(s).
+
+# Step 1 #
+Define each physical field in proper space. For example,
+	- fespace VhX(Th, [space])  // For vector
+	- fespace VhY(Th, space)  // For scalar
+	- fespace VhdeltaX(Th, [space])  // For vector test function
+	- fespace VhdeltaY(Th, space)  // For scalar test function
+
+# Step 2 #
+Build the mixed space(s) if multiple fields are provided. The mixed space(s) are built by multipling the originally defined spaces by "<>". For example,
+	- fespace Ch = <VhX*VhY>  // For solution fields
+	- fespace Cht = <VhdeltaX*VhdeltaY>  // For test fields
+
+# Step 3 #
+Give initial values for each variable in the field(s) directly in the following way. For example,
+	- VhX [Xx, Xy, Xz] = [..., ..., ...]  // For vector, ... are values
+	- VhY Y = ...  // For scalar, ... is a value
+Attention: It is not allowed to initial the values independantly by Xx = value or Y = initialValue. This is not allowed by the FreeFEM grammar. Their values must be given in the above way.
+
+# Step 4 #
+Give incremental variable(s) for each field. For example,
+	- VhX [incXx, incXy, incXz]  // For vector
+	- VhY incY  // For scalar
+
+# Step 5 #
+Give test variable(s) for each test field. For example,
+	- VhdeltaX [deltaXx, deltaXy, deltaXz]  // For vector
+	- VhdeltaY deltaY  // For scalar

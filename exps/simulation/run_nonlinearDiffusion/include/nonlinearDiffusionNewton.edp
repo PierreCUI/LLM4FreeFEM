@@ -1,0 +1,6 @@
+varf nonlinearDiffusionNewton([incu],[deltau])
+  = int2d(Th)(
+      ( lambda0/(1.0 + u^2) )*( dx(incu)*dx(deltau) + dy(incu)*dy(deltau) )
+    + ( -2.0*lambda0*u/((1.0 + u^2)^2) )*incu*( dx(u)*dx(deltau) + dy(u)*dy(deltau) )
+    )
+  + on(4,incu=0);

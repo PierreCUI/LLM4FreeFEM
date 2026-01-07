@@ -1,0 +1,13 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+	- diffusion coefficient: k = 1,
+	- mass / reaction term: m = 1,
+	- source term amplitude: f = 4.
+
+2. Mesh
+The computational domain is a unit square. This domain is divided into a regular grid with nn = 20. It is labeled by [1, 2, 3, 4].
+
+3. Space
+T is defined within P1 space.

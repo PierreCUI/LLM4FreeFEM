@@ -1,0 +1,62 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants.
+real nu = 3.0e-1;
+real E = 2.1e11;
+real alpha = 1.69e-5;
+real k = 45.0;
+
+int n = 20;
+
+// Define the mesh.
+int[int] labels = [1, 2, 3, 4];
+mesh Th = square(8*n, n, [0.35*x, 0.02*(y-0.5)], label=labels);
+
+// Define the FE spaces.
+fespace VhU(Th, [P2, P2]);
+fespace VhT(Th, P2);
+
+fespace VhdeltaU(Th, [P2, P2]);
+fespace VhdeltaT(Th, P2);
+
+// Build mixed spaces.
+fespace Ch = <VhU*VhT>;
+fespace Cht = <VhdeltaU*VhdeltaT>;
+
+// Define solution fields with initial values.
+VhU [ux, uy] = [0.0, 0.0];
+VhT T = 10.0*x;
+
+// Define increments.
+VhU [incux, incuy];
+VhT incT;
+
+// Define test functions.
+VhdeltaU [deltaux, deltauy];
+VhdeltaT deltaT;
+
+// Include the files from ./include folder.
+include "include/thermoElasticityNewton.edp"
+include "include/thermoElasticityResidual.edp"
+
+// Solve the problem (linear, one step).
+matrix A = thermoElasticityNewton(Ch, Cht);
+set(A, solver=sparsesolver);
+
+real[int] rhs = thermoElasticityResidual(0, Cht);
+real[int] sol = A^-1 * rhs;
+
+[incux[], incT[]] = sol;
+ux[] -= incux[];
+T[]  -= incT[];
+
+// Save the results.
+string DataNameTh = "ux uy T";
+int[int] OrderTh = [2, 2, 2];
+savevtk("results/thermoElasticity2d.vtu", Th, [ux, uy], T, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

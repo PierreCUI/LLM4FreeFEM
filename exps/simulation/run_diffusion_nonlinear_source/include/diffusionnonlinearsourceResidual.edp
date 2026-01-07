@@ -1,0 +1,10 @@
+varf diffusionnonlinearsourceResidual([incT,incu],[deltaT,deltau]) =
+  int2d(Th)(
+      k*(dx(T)*dx(deltaT) + dy(T)*dy(deltaT))
+    + k*(dx(u)*dx(deltau) + dy(u)*dy(deltau))
+    - (f0/(1 + T^2 + sin(u)))*deltaT
+    - T*deltau
+  )
+  + on(1,incT=0)
+  + on(1,incu=0)
+;

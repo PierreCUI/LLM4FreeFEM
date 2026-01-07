@@ -1,0 +1,1 @@
+varf diffusion3dResidual([incT],[deltaT]) = int3d(Th)( k*( dx(T)*dx(deltaT) + dy(T)*dy(deltaT) + dz(T)*dz(deltaT) ) - f*deltaT ) + on(5,incT=0);

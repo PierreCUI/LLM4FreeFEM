@@ -1,0 +1,15 @@
+varf thermoElasticityResidual([incux,incuy,incT],[deltaux,deltauy,deltaT]) =
+  int2d(Th)(
+      (E/(2.0*(1.0+nu))) * ( dx(ux)*dx(deltaux) + dy(uy)*dy(deltauy)
+                           + 2.0*(0.5*(dy(ux)+dx(uy)))*(0.5*(dy(deltaux)+dx(deltauy))) )
+    + (E*nu/((1.0+nu)*(1.0-2.0*nu))) * ( (dx(ux)+dy(uy))*(dx(deltaux)+dy(deltauy)) )
+    - (E/(1.0-2.0*nu))*alpha * T * (dx(deltaux)+dy(deltauy))
+    + k*( dx(T)*dx(deltaT) + dy(T)*dy(deltaT) )
+  )
+  + on(2,incux=0.0)
+  + on(4,incux=0.0)
+  + on(2,incuy=0.0)
+  + on(4,incuy=0.0)
+  + on(2,incT=0.0)
+  + on(4,incT=0.0)
+;

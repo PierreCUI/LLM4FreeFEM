@@ -1,0 +1,170 @@
+FreeFEM++ 3D Mesh Construction Guide
+
+This document provides a professional, structured overview of the tools, concepts, and workflow required to construct three-dimensional meshes in FreeFEM++.
+
+1. Required Libraries and the "load" Mechanism
+	The most relevant libraries for 3D mesh construction are:
+		1) msh3
+		   - Enables the 3D mesh object type mesh3.
+		   - Provides 3D geometric primitives and mesh manipulation utilities.
+		   - Enables 3D finite element spaces (such as P1, P2).
+		   Without this library, 3D meshes cannot be created or used.
+		2) tetgen
+		   - Integrates the TetGen tetrahedral mesh generator.
+		   - Allows automatic creation of high-quality tetrahedral meshes.
+		   - Used internally by functions such as buildlayers().
+		   Essential for generating robust 3D tetrahedral meshes.
+
+2. Fundamental Tools for Mesh Definition
+	2.1 border — 2D Boundary Definition
+		The border command defines a parametric curve that acts as the boundary of a 2D region.
+		Structure:
+			border name(t=a,b) { x = f(t); y = g(t); label = L; }
+		Explanation of parameters:
+			- name: Identifier for the border.
+			- t: A parameter varying from a to b.
+			- x, y: Parametric equations describing the curve.
+			- label (optional): An integer boundary label applied to this curve. This is an optional parameter.
+
+	2.2 buildmesh — 2D Mesh Generation
+		This function converts one or more parametric borders into a triangulated 2D mesh suitable for finite element work.
+		Function Structure:
+			mesh Th2D = buildmesh( border1(n1) + border2(n2) + ... );
+		Explanation of parameters:
+			- borderX(nX):
+				- borderX is a previously defined border.
+				- nX specifies the number of subdivisions used to discretize that border.
+			- The '+' operator concatenates borders to construct a full closed shape.
+		Output:
+			- A 2D triangular mesh covering the interior of the borders.
+
+	2.3 buildlayers — Extrusion from 2D to 3D
+		This function constructs a 3D tetrahedral mesh by extruding an existing 2D mesh along the z-axis.
+		Function Structure:
+			mesh3 Th = buildlayers(
+				Th2D,
+				nLayers,
+				zbound = [zmin, zmax],
+				labeldown = [oldLabel, newLabel],
+				labelup = [oldLabel, newLabel],
+				labelmid = [oldLabel, newLabel],
+			);
+		Explanation of parameters:
+			- Th2D
+			   The base 2D mesh to be extruded.
+			- nLayers
+			   Number of layers in the extrusion direction. Controls resolution along z.
+			- zbound
+			   The lower and upper z-coordinates that define the height of the 3D mesh.
+			- labeldown (optional)
+			   Assigns a boundary label to the bottom surface. This is an optional parameter.
+			- labelup (optional)
+			   Assigns a boundary label to the top surface. This is an optional parameter.
+			- labelmid (optional)
+			   Assigns a boundary label to the middle surface. This is an optional parameter.
+		Output:
+			- A 3D tetrahedral mesh corresponding to the original 2D mesh.
+
+	2.4 movemesh — Geometric Transformation
+		This function applies a geometric transformation to an existing mesh. This function can be used to move the mesh to a proper initial position.
+		Function Structure:
+			Th = movemesh(Th, [Xnew(x,y,z), Ynew(x,y,z), Znew(x,y,z)]);
+		Explanation of parameters:
+			- Th
+				The original mesh to be transformed.
+			- [Xnew, Ynew, Znew]
+			   A vector-valued transformation defining the new coordinates of each node:
+				   Xnew = function of (x, y, z)
+				   Ynew = function of (x, y, z)
+				   Znew = function of (x, y, z)
+			   Each node (x, y, z) is replaced by (Xnew, Ynew, Znew).
+		Note:
+			This function operates on the original mesh. It works as: Th = movemesh(Th, ...) without defining a new 3D mesh.
+		Output:
+			- The original mesh but with updated geometry position.
+
+	2.5 square — Structured 2D Rectangular Mesh
+		The square command generates a structured triangular mesh on a rectangular domain. It creates a regular nx by ny grid of quadrilaterals.
+		Function Structure:
+			mesh Th2D = square(nx, ny, *, label = labels);
+		Explanation of parameters:
+			- nx, ny
+				These are the numbers of subdivisions in the x-directions and y-directions. The resulting grid has nx * ny rectangular cells, each of which is divided into two triangles.
+			- * (Optional)
+				This argument specifies a geometric transformation that transforms the unit square into a deformed or resized physical domain. This parameter can solve the transformation directly. It is no need to use movemesh after. This is of form [t1(x, y, ...), t2(x, y, ...), ...]. This is an optional parameter.
+			- label (Optional)
+				This parameter assigns boundary labels to the four edges of the square. These labels must contain exactly four integers in the following order: bottom, right, top, left. This is an optional parameter.
+		Output:
+			The function returns a 2D triangular mesh.
+	
+	2.6 trunc — Subdomain Extraction from an Existing Mesh
+		The trunc command is used to extract a subdomain or a portion of the boundary from an existing mesh, producing a new mesh that contains only the selected region. This function is essential for domain decomposition, splitting fluid and solid regions, isolating boundary segments, or generating separate meshes for multiphysics coupling.
+		Function Structure:
+			ThNew = trunc(Th, region, label);
+		Explanation of parameters:
+			- Th
+				The original mesh from which a subdomain or boundary portion is to be extracted. The geometry and connectivity of the original mesh are preserved, but only the selected elements are kept in the output.
+			- region
+				A logical condition specifying which region ID to keep.
+			- label (Optional)
+				An optional boundary label applied to the boundary of the truncated mesh. This is an optional parameter.
+		Output:
+			- A new mesh containing only the elements whose region number satisfies the given condition.
+		Attention:
+			Due to FreeFEM grammar limitation, this function can only receive integers as labels. If a list of labels is need to be provided, give a integer first, then use change function. For example, trunc(Th, ..., label=1); int[int] labels = [1, 2, 3, ...]; change(..., label=labels);.
+	
+	2.7 change — Mesh Modification
+		The change command is used to modify the mesh, such as the internal region identifiers or boundary labels of an existing mesh, without altering its geometry or connectivity.
+		Function Structure: 
+			ThNew = change(Th, condition);
+		Explanation of parameters:
+			- Th
+				The original mesh to be modified.
+			- condition
+				You must take care of different ways the parameters are passed to the function.
+				- fregion
+					A logical expression to assign a region number. For example, change(Th, fregion=(x < a) + (x > b) + ...). This is an expression to be passed as a parameter directly. The expression is not a list.
+				- label (Optional)
+					A new label to be assigned to the mesh. For example, change(Th, label=labels). Defined the labels first as int[int] explicitly if it is a list, then pass it as a parameter. This is an optional parameter.
+		Output:
+			An updated mesh.
+		Attention:
+			The change function works on the original mesh. It is thus not allowed to define a new mesh after change. The correct way to use it is Th = change(Th, ...).
+
+3. Fundamental IO Tools
+	3.1 savemesh - Mesh Export to File
+		The savemesh command is used to save a mesh to a file on disk, so that it can be reused later or post-processed by other scripts. This is essential for separating the mesh-generation stage from the simulation stage.
+		Function Structure:
+			savemesh(Th, name);
+		Explanation of parameters:
+			- Th
+				The mesh to be saved. This can be a 2D mesh (mesh) or a 3D mesh (mesh3).
+			- name
+				The name of the output file. The extension is typically .mesh.
+	
+	3.2 readmesh - Mesh Import from File
+		The readmesh command is used to read a mesh previously saved with savemesh. This allows you to reuse the same mesh across multiple simulations without regenerating it.
+		Function Structure:
+			mesh Th = readmesh(name);
+			mesh3 Th = readmesh(name);
+		Explanation of parameters:
+			- name
+				The name of the mesh file to be read. The extension can be .mesh, or .o.mesh after the treatment of mmg2d.
+	
+	3.3 system - Execute an Operating-System Command
+		The system command is used to call an external operating-system command directly from within a FreeFEM script. It allows FreeFEM to interact with the shell environment, run external programs, manage files, or trigger external scripts.
+
+4. External Tools
+	4.1 mmg2d - Automatic Optimization and Adaptation
+		mmg2d performs automatic optimization and adaptation of 2D meshes, improving mesh quality by refining or coarsening where needed. It is mmg2d in Windows, or mmg2d_O3 in Linux. (We use Windows version by default.)
+		Function Structure:
+			int Res = system("mmg2d Name -param param");
+		Explanation of parameters:
+			- Name
+				The name of the mesh to be saved, without extension, for example, Mesh.
+			- param
+				The other parameters to do the work.
+		Output:
+			A mesh file named Name.o.mesh, for example, Mesh.o.mesh.
+		Attention:
+			Don't try to load mmg, as this is an order of cmd. FreeFEM is just using "system" order to call the system cmd.

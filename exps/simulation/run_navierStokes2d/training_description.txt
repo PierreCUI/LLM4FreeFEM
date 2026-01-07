@@ -1,0 +1,19 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+    - fluid density: rho = 1,
+    - dynamic viscosity: mu = 1.827e-2,
+    - penalty parameter: gamma = 1.0e-9.
+
+2. Mesh
+The computational domain is defined by a unit square, and it is discretized using n = 40 segments, and with a transformation [x, (0.1+0.1*x)*y + 4*x^2*(1-x)^2]. This mesh is then saved. A 2d mesh adaptation is performed by "mmg2d" commend, refining the mesh so that no element exceeds a maximum size of 0.0025. Read back the mesh by covering directly the old mesh's variable. No label is required.
+
+3. Iteration Times
+The for loop should iterate from 0 until 40. Early stop if rhs.linfty is smaller than 1e-6 and sol.linfty is smaller than 1e-5.
+
+4. Initial field
+The initial speed is defined as y*(y-0.1)*(x<0.0005) at vx, and 0 at vy. The pressure is 0 at initial.
+
+5. Space
+v is defined within P2 space, p is defined within P1 space.

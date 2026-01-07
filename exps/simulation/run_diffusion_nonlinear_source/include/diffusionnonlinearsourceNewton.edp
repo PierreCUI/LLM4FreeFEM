@@ -1,0 +1,11 @@
+varf diffusionnonlinearsourceNewton([incT,incu],[deltaT,deltau]) =
+  int2d(Th)(
+      k*(dx(incT)*dx(deltaT) + dy(incT)*dy(deltaT))
+    + k*(dx(incu)*dx(deltau) + dy(incu)*dy(deltau))
+    + (f0*(2*T)/((1 + T^2 + sin(u))^2))*incT*deltaT
+    + (f0*cos(u)/((1 + T^2 + sin(u))^2))*incu*deltaT
+    - incT*deltau
+  )
+  + on(1,incT=0)
+  + on(1,incu=0)
+;

@@ -1,0 +1,17 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+	- Poisson's ratio: nu = 3.0e-1,
+	- Young's modulus: E = 2.1e11,
+	- thermal expansion coefficient: alpha = 1.69e-5,
+	- thermal conductivity: k = 45.
+
+2. Mesh
+The computational domain is generated from a unit square discretized into 8n * n uniform subdivisions with n = 20, and with a transformation [0.35x, 0.02(y - 0.5)].
+
+3. Space
+u and T are defined within P2 space. 
+
+4. Initial Values
+T is initialized to 10 * x.

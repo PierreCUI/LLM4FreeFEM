@@ -1,0 +1,12 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+	- diffusion coefficient: k = 1,
+	- source term amplitude: f = 4.
+
+2. Mesh
+The computational domain is a circular hole. The hole is defined by a parametric boundary centered at (0.5, 0.5) with radius 0.3, and it is discretized using nn2 = 6 * 2^level segments, where level = 2. This hole boundary is assigned the label 4. A 3d mesh is built based on this boundary mesh directly with MaxLayer = 2^level between zmin=0.0 and zmax=2.0, with bottom labeled as [0, 6] and top labeled as [0, 5]. Mid is not labeled.
+
+3. Space
+T is defined within P1 space.

@@ -1,0 +1,1 @@
+varf diffusionNewton([incT],[deltaT]) = int2d(Th)( k*( dx(incT)*dx(deltaT) + dy(incT)*dy(deltaT) ) ) + on(1,incT=0);

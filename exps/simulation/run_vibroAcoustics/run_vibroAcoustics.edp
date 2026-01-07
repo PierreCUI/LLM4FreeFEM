@@ -1,0 +1,79 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants.
+real nu = 3.0e-1;
+real E = 2.1e+11;
+real Kf = 2.2e+9;
+real rhof = 1.0e+3;
+real rhos = 7.75e+3;
+real omega = 5.0e+3;
+
+// Build the mesh: unit square with 2000*40 subdivisions and transformation [5x, y].
+int nX = 2000;
+int nY = 40;
+mesh Th = square(nX, nY, [5.0*x, y], label=[1,2,3,4]);
+
+// Assign region indicator.
+Th = change(Th, fregion = (x < 2.49) + (x > 2.51) + ((x > 2.49) * (x < 2.51) * (y < 0.1)) );
+
+// Extract fluid and solid meshes.
+// Fluid region is marked as region 1; and its boundary is labeled as 5 by trunc setting.
+mesh Thf = trunc(Th, region == 1, label=5);
+
+// Solid region corresponds to region 0; we first truncate with a single label then change labels to [2,5].
+mesh Ths = trunc(Th, region == 0, label=2);
+int[int] labelsThs = [2, 5];
+Ths = change(Ths, label=labelsThs);
+
+// Define FE spaces.
+fespace VhS(Ths, [P2, P2]);
+fespace VhF(Thf, P2);
+
+fespace VhdeltaS(Ths, [P2, P2]);
+fespace VhdeltaF(Thf, P2);
+
+// Solution fields with initial values.
+VhS [ux, uy] = [0.0, 0.0];
+VhF p = 10.0*x;
+
+// Incremental unknowns.
+VhS [incux, incuy];
+VhF incp;
+
+// Test functions.
+VhdeltaS [deltaux, deltauy];
+VhdeltaF deltap;
+
+// Mixed spaces.
+fespace Ch = <VhS*VhF>;
+fespace Cht = <VhdeltaS*VhdeltaF>;
+
+// Include the provided variational forms.
+include "include/vibroAcousticsNewton.edp"
+include "include/vibroAcousticsResidual.edp"
+
+// Solve in one Newton step (linear problem).
+matrix A = vibroAcousticsNewton(Ch, Cht);
+set(A, solver=sparsesolver);
+
+real[int] rhs = vibroAcousticsResidual(0, Cht);
+real[int] sol = A^-1 * rhs;
+
+[incux[], incp[]] = sol;
+ux[] -= incux[];
+p[]  -= incp[];
+
+// Save results to separate VTU files for Ths and Thf.
+string dataNameThs = "ux uy";
+int[int] orderThs = [2, 2];
+savevtk("results/Ths.vtu", Ths, ux, uy, dataname=dataNameThs, order=orderThs);
+
+string dataNameThf = "p";
+int[int] orderThf = [2];
+savevtk("results/Thf.vtu", Thf, p, dataname=dataNameThf, order=orderThf);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

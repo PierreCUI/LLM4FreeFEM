@@ -1,0 +1,45 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants of the program.
+real k = 1.0;
+real f = 4.0;
+int nn = 20;
+
+// Define the mesh according to the problem demands.
+// square(nx, ny, ...) expects "label" to be an int[int] array.
+int[int] labels = [1, 2, 3, 4];
+mesh Th = square(nn, nn, label=labels);
+
+// Define the FE spaces.
+fespace VhT(Th, P1);
+fespace VhdeltaT(Th, P1);
+
+// Define the field, increment, and test function.
+VhT T = 0.0;
+VhT incT;
+VhdeltaT deltaT;
+
+// Include the equations.
+include "include/diffusionNewton.edp";
+include "include/diffusionResidual.edp";
+
+// Solve the linear diffusion problem (one Newton step is enough).
+{
+	matrix A = diffusionNewton(VhT, VhdeltaT);
+	set(A, solver=sparsesolver);
+	real[int] rhs = diffusionResidual(0, VhdeltaT);
+	real[int] sol = A^-1 * rhs;
+	[incT[]] = sol;
+	T[] -= incT[];
+}
+
+// Save the results.
+string DataNameTh = "T";
+int[int] OrderTh = [1];
+savevtk("results/diffusion.vtu", Th, T, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

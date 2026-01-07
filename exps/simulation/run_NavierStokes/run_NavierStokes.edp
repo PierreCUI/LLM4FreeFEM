@@ -1,0 +1,95 @@
+real timeStart = clock();
+
+// Load necessary packages.
+load "msh3";
+load "tetgen";
+load "iovtk";
+
+// Define all constants.
+real rho = 1.0e+3;
+real mu = 1.0e-3;
+real gamma = 1.0e-9;
+
+real r = 0.1;
+int nn2 = 25;
+
+int maxLayer = 40;
+real zmin = 0.0;
+real zmax = 2.0;
+
+int maxIterSize = 40;
+
+// Define the 2D base mesh (circle, label 0).
+border Circle(t=0.0, 2.0*pi)
+{
+	x = r*cos(t);
+	y = r*sin(t);
+	label = 0;
+}
+mesh Th2 = buildmesh(Circle(nn2));
+
+// Build the 3D mesh by extrusion.
+mesh3 Th = buildlayers(
+	Th2,
+	maxLayer,
+	zbound = [zmin, zmax],
+	labeldown = [0, 1],
+	labelup   = [0, 2],
+	labelmid  = [0, 3]
+);
+
+// Move mesh to initial position.
+Th = movemesh(Th, [x + z^2.0*(zmax - z)^2.0, y, z]);
+
+// Define FE spaces.
+fespace VhV(Th, [P2, P2, P2]);
+fespace VhP(Th, P1);
+
+fespace VhdeltaV(Th, [P2, P2, P2]);
+fespace VhdeltaP(Th, P1);
+
+// Define fields and initialize.
+VhV [vx, vy, vz] = [0.0, 0.0, 5.0e-2*(r^2.0 - x^2.0 - y^2.0)*(z < 0.05)];
+VhP p = 0.0;
+
+// Define increments.
+VhV [incvx, incvy, incvz];
+VhP incp;
+
+// Define test functions.
+VhdeltaV [deltavx, deltavy, deltavz];
+VhdeltaP deltap;
+
+// Mixed spaces.
+fespace Ch = <VhV, VhP>;
+fespace Cht = <VhdeltaV, VhdeltaP>;
+
+// Include provided variational forms.
+include "include/NavierStokesNewton.edp"
+include "include/NavierStokesResidual.edp"
+
+// Newton loop.
+for (int i = 0; i < maxIterSize; i += 1)
+{
+	matrix A = NavierStokesNewton(Ch, Cht);
+	set(A, solver=sparsesolver);
+
+	real[int] rhs = NavierStokesResidual(0, Cht);
+	real[int] sol = A^-1 * rhs;
+
+	[incvx[], incp[]] = sol;
+
+	vx[] -= incvx[];
+	p[]  -= incp[];
+
+	cout << "Iter " << i << "  rhs.linfty=" << rhs.linfty << "  sol.linfty=" << sol.linfty << endl;
+
+	if ((rhs.linfty < 1.0e-6) && (sol.linfty < 1.0e-5)) break;
+}
+
+// Save results.
+string DataNameTh = "vx vy vz p";
+int[int] OrderTh = [2, 2, 2, 1];
+savevtk("results/NavierStokes3d.vtu", Th, vx, vy, vz, p, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

@@ -1,0 +1,17 @@
+# Problem Description #
+
+This problem studies a steady-state diffusion heat conduction process defined over a spatial domain Omega. The objective is to compute the spatial distribution of an unknown field T(x). The formulation includes a complex term mass contribution.
+
+# Governing Equation and Variables #
+
+The process is governed by the complex partial differential equation: -div(k * grad(T)) + (m + 0.1*i) * T = f in Omega. The problem is defined within 2 dimensions, thus x and y.
+
+Constants:
+    k: diffusion coefficient,
+    m: mass/reaction coefficient,
+    f: source strength.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+    T = 0 on boundary labeled as 1.

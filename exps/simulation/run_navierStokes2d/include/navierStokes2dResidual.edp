@@ -1,0 +1,22 @@
+varf navierStokes2dResidual([incvx,incvy,incp],[deltavx,deltavy,deltap]) =
+  int2d(Th)(
+      rho*( (vx*dx(vx) + vy*dy(vx))*deltavx
+          + (vx*dx(vy) + vy*dy(vy))*deltavy )
+    + muT*( (dx(vx)*dx(deltavx) + dy(vy)*dy(deltavy))
+          + 0.5*( (dy(vx)+dx(vy))*(dy(deltavx)+dx(deltavy)) ) )
+    - p*(dx(deltavx)+dy(deltavy))
+    - deltap*(dx(vx)+dy(vy))
+    + gamma*p*deltap
+  )
+  + int1d(Th,2)(
+      1e9*( (vx - (N.x*vx + N.y*vy)*N.x)*deltavx
+          + (vy - (N.x*vx + N.y*vy)*N.y)*deltavy )
+  )
+  + on(1,incvx=0)
+  + on(1,incvy=0)
+  + on(3,incvx=0)
+  + on(3,incvy=0)
+  + on(4,incvx=0)
+  + on(4,incvy=0)
+  + on(2,incp=0)
+;

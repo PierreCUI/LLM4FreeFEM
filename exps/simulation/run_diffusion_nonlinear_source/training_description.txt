@@ -1,0 +1,15 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+	- diffusion coefficient: k = 1,
+	- source strength parameter: f0 = 4.
+
+2. Mesh
+The computational domain is a unit square divided into a regular grid with nn = 20 and is labeled as [1, 2, 3, 4].
+
+3. Iteration Times
+The for loop should iterate from 0 until 40. Early stop if rhs.linfty is smaller than 1e-6 and sol.linfty is smaller than 1e-5.
+
+4. Space
+T and u are defined within P1 space.

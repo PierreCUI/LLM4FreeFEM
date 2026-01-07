@@ -1,0 +1,17 @@
+# Problem Description #
+
+This problem considers a stationary diffusion system on a spatial domain Omega. The objective is to compute the fields T(x) and u(x).
+
+# Governing Equations #
+
+The process is governed by the partial differential equation: -div(k * grad(T)) = f(T, u) in Omega and -div(k * grad(u)) = T in Omega with f(T, u) = f0 / (1 + T^2 + sin(u)). The problem is defined within 2 dimensions, thus x and y.
+
+Constants:
+	k: diffusion coefficient,
+	f: nonlinear source term,
+	f0: source strength parameter.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+	T = 0 and u = 0 on boundary labeled as 1.

@@ -1,0 +1,18 @@
+1. A name should be given for each variable X, such as T for temperature. 
+If the letter is already given in the problem, such as u, then you should use the same letter.
+If you need to represent the components within space of a variable, you may use x, y, z. For example, vx, vy, vz for v.
+2. The incremental variable should be named with incX, such as incT for incremental temperature.
+3. The test function should be named with deltaX, such as deltaT for test in temperature.
+4. In each file, you define one single varf with the name {name}Newton and {name}Residual.
+5. Newton takes [incX] and [deltaX] as input. It uses incX and deltaX to form the equation.
+The inputs must be within [], even if only one variable inside.
+6. Residual takes [incX] and [deltaX] as input. The inputs must be within [], even if only one variable inside.
+However, it uses the variable X and deltaX to form. This is a special grammar for the FreeFEM software. You must obey this.
+7. For boundary conditions, you should give one condition for each term. You should not merge multiple conditions in one "on". 
+8. For boundary conditions, it considers increment instead of the value. The increment can be 0 even if the value is not 0.
+9. It is strictly forbidden to use "_" in FreeFEM. Always use Camel Case to name the variables and functions.
+For inc and delta, you may still use incux, deltaux, to maintain the ux, instead of Ux.
+10. You should write everything in one varf, instead of defining multiple funcs or reals.  
+11. For complex number, the FreeFEM supports to use i directly, for example, 1 + 2i.
+12. For power, the FreeFEM supports to use ^ directly, for example, X^2.
+13. Please write 1.0 instead 1. and so on. You should write this in complete form.

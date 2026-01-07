@@ -1,0 +1,3 @@
+varf diffusionbvpResidual([incT],[deltaT])=
+int2d(Th)( k*(dx(T)*dx(deltaT)+dy(T)*dy(deltaT)) + (m+0.1i)*T*deltaT - f*deltaT )
++ on(1,incT=0);

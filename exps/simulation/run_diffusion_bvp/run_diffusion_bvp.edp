@@ -1,0 +1,48 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants of the program.
+real k = 1.0;
+real m = 1.0;
+real f = 4.0;
+int nn = 20;
+int[int] labels = [1, 2, 3, 4];
+
+// Define the mesh according to the problem demands.
+mesh Th = square(nn, nn, label=labels);
+
+// Define the FE spaces and fields (complex).
+fespace VhT(Th, P1);
+fespace VhdeltaT(Th, P1);
+
+VhT<complex> T = 0.0 + 0.0i;
+VhT<complex> incT;
+
+VhdeltaT<complex> deltaT;
+
+// Include the files from ./include folder.
+include "include/diffusionbvpNewton.edp"
+include "include/diffusionbvpResidual.edp"
+
+// Solve the problem.
+matrix<complex> A = diffusionbvpNewton(VhT, VhdeltaT);
+set(A, solver=sparsesolver);
+
+complex[int] rhs = diffusionbvpResidual(0, VhdeltaT);
+complex[int] sol = A^-1 * rhs;
+
+[incT[]] = sol;
+T[] -= incT[];
+
+// Save the results.
+VhT TRe = real(T);
+VhT TIm = imag(T);
+
+string DataNameTh = "TRe TIm";
+int[int] OrderTh = [1, 1];
+savevtk("results/diffusionbvp.vtu", Th, TRe, TIm, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

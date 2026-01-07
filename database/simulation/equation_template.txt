@@ -1,0 +1,13 @@
+# This is a template of equations #
+
+varf nameNewton([incX, incY, incZ], [deltaX, deltaY, deltaZ]) = 
+	...  // Equation
+	+ on(label, incX = 0)
+	+ on(label, incY = 0)
+	...;
+
+varf nameResidual([incX, incY, incZ], [deltaX, deltaY, deltaZ]) = 
+	...  // Equation
+	+ on(label, incX = 0)
+	+ on(label, incY = 0)
+	...;

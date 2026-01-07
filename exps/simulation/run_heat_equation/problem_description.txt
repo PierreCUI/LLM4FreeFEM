@@ -1,0 +1,18 @@
+# Problem Description #
+
+This problem studies a transient heat conduction process defined over a spatial domain Omega. The objective is to compute the time–dependent unknown temperature field u(x, t).
+
+# Governing Equation and Variables #
+
+The process is governed by the partial differential equation: c * (du/dt) - div(k * grad(u)) = f in Omega. The problem is defined within 2 dimensions, thus x and y. uold is the solution from the previous time step.
+
+Constants:
+    k: thermal conductivity,
+    c: heat capacity,
+    f: heat source strength,
+	timeStepSize: the temporal increment for the simulation.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+    u = 0 on boundary labeled as 1.

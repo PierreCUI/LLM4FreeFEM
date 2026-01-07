@@ -1,0 +1,10 @@
+varf linearDiffusionAdjoint([adju], [deltau]) =
+	int2d(Th)(lambda * chi(x, y) * (dx(adju) * dx(deltau) + dy(adju) * dy(deltau)) + u * deltau)
+	+ on(3, adju = 0);
+
+matrix adjointMatrix = linearDiffusionAdjoint(Vh, Vh);
+set(adjointMatrix, solver=sparsesolver);
+real[int] adjointrhs = linearDiffusionAdjoint(0, Vh);
+real[int] adjointsol = adjointMatrix^-1 * adjointrhs;
+adjointsol = -adjointsol;
+adju[] = adjointsol;

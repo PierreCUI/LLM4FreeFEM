@@ -1,0 +1,22 @@
+varf navierStokes2dNewton([incvx,incvy,incp],[deltavx,deltavy,deltap]) =
+  int2d(Th)(
+      rho*( (incvx*dx(vx) + incvy*dy(vx) + vx*dx(incvx) + vy*dy(incvx))*deltavx
+          + (incvx*dx(vy) + incvy*dy(vy) + vx*dx(incvy) + vy*dy(incvy))*deltavy )
+    + muT*( (dx(incvx)*dx(deltavx) + dy(incvy)*dy(deltavy))
+          + 0.5*( (dy(incvx)+dx(incvy))*(dy(deltavx)+dx(deltavy)) ) )
+    - incp*(dx(deltavx)+dy(deltavy))
+    - deltap*(dx(incvx)+dy(incvy))
+    + gamma*incp*deltap
+  )
+  + int1d(Th,2)(
+      1e9*( (incvx - (N.x*incvx + N.y*incvy)*N.x)*deltavx
+          + (incvy - (N.x*incvx + N.y*incvy)*N.y)*deltavy )
+  )
+  + on(1,incvx=0)
+  + on(1,incvy=0)
+  + on(3,incvx=0)
+  + on(3,incvy=0)
+  + on(4,incvx=0)
+  + on(4,incvy=0)
+  + on(2,incp=0)
+;

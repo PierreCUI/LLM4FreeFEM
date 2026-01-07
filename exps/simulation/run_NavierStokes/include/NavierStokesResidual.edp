@@ -1,0 +1,31 @@
+varf NavierStokesResidual([incvx,incvy,incvz,incp],[deltavx,deltavy,deltavz,deltap]) =
+  int3d(Th)(
+      rho*(
+          (vx*dx(vx) + vy*dy(vx) + vz*dz(vx))*deltavx
+        + (vx*dx(vy) + vy*dy(vy) + vz*dz(vy))*deltavy
+        + (vx*dx(vz) + vy*dy(vz) + vz*dz(vz))*deltavz
+      )
+
+    + mu*(
+          (dx(vx))*(dx(deltavx))
+        + (dy(vy))*(dy(deltavy))
+        + (dz(vz))*(dz(deltavz))
+
+        + 2.0*(0.5*(dy(vx)+dx(vy)))*(0.5*(dy(deltavx)+dx(deltavy)))
+        + 2.0*(0.5*(dz(vx)+dx(vz)))*(0.5*(dz(deltavx)+dx(deltavz)))
+        + 2.0*(0.5*(dz(vy)+dy(vz)))*(0.5*(dz(deltavy)+dy(deltavz)))
+      )
+
+    - p*(dx(deltavx)+dy(deltavy)+dz(deltavz))
+    + (-(dx(vx)+dy(vy)+dz(vz)) + gamma*p)*deltap
+  )
+  + on(1,incvx=0)
+  + on(1,incvy=0)
+  + on(1,incvz=0)
+  + on(3,incvx=0)
+  + on(3,incvy=0)
+  + on(3,incvz=0)
+  + on(4,incvx=0)
+  + on(4,incvy=0)
+  + on(4,incvz=0)
+;

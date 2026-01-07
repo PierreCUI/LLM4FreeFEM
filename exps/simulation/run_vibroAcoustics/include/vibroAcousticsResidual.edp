@@ -1,0 +1,26 @@
+varf vibroAcousticsResidual([incux,incuy,incp],[deltaux,deltauy,deltap])=
+int2d(Ths)(
+    (E/(2.0*(1.0+nu)))
+    *(
+        (dx(ux)*dx(deltaux) + dy(uy)*dy(deltauy))
+      + 0.5*(dy(ux)+dx(uy))*(dy(deltaux)+dx(deltauy))
+     )
+  + (E*nu/((1.0+nu)*(1.0-2.0*nu)))
+    *( (dx(ux)+dy(uy))*(dx(deltaux)+dy(deltauy)) )
+  - (omega^2)*rhos*(ux*deltaux + uy*deltauy)
+)
++ int1d(Ths,5)(
+    p*(deltaux*N.x + deltauy*N.y)
+)
++ int2d(Thf)(
+    (dx(p)*dx(deltap) + dy(p)*dy(deltap))
+  - (omega^2)*(rhof/Kf)*p*deltap
+)
++ int1d(Ths,5)(
+    -rhof*(ux*N.x + uy*N.y)*deltap
+)
++ on(3,incux=0.0)
++ on(3,incuy=0.0)
++ on(2,incp=0.0)
++ on(4,incp=0.0)
+;

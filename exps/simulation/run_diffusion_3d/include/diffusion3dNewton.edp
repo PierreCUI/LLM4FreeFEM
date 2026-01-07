@@ -1,0 +1,1 @@
+varf diffusion3dNewton([incT],[deltaT]) = int3d(Th)( k*( dx(incT)*dx(deltaT) + dy(incT)*dy(deltaT) + dz(incT)*dz(deltaT) ) ) + on(5,incT=0);

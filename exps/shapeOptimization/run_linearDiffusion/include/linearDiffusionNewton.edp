@@ -1,0 +1,3 @@
+varf linearDiffusionNewton([incu], [deltau]) =
+	int2d(Th)(lambda * chi(x, y) * (dx(incu) * dx(deltau) + dy(incu) * dy(deltau)))
+	+ on(3, incu = 0);

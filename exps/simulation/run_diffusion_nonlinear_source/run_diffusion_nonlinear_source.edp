@@ -1,0 +1,68 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants of the program.
+real k = 1.0;
+real f0 = 4.0;
+
+int nn = 20;
+int maxIterSteps = 40;
+
+// Define the mesh according to the problem demands.
+int[int] labels = [1, 2, 3, 4];
+mesh Th = square(nn, nn, label=labels);
+
+// Define the FE spaces and mixed spaces.
+fespace VhT(Th, P1);
+fespace VhdeltaT(Th, P1);
+
+fespace Vhu(Th, P1);
+fespace VhdeltaU(Th, P1);
+
+VhT T = 0.0;
+Vhu u = 0.0;
+
+VhT incT;
+Vhu incu;
+
+VhdeltaT deltaT;
+VhdeltaU deltau;
+
+fespace Ch = <VhT*Vhu>;
+fespace Cht = <VhdeltaT*VhdeltaU>;
+
+// Include the files from ./include folder.
+include "include/diffusionnonlinearsourceNewton.edp"
+include "include/diffusionnonlinearsourceResidual.edp"
+
+// Solve the problem.
+for (int i = 0; i < maxIterSteps; i += 1)
+{
+	matrix A = diffusionnonlinearsourceNewton(Ch, Cht);
+	set(A, solver=sparsesolver);
+
+	real[int] rhs = diffusionnonlinearsourceResidual(0, Cht);
+	real rhsInf = rhs.linfty;
+
+	real[int] sol = A^-1 * rhs;
+	real solInf = sol.linfty;
+
+	[incT[], incu[]] = sol;
+
+	T[] -= incT[];
+	u[] -= incu[];
+
+	cout << "Iter " << i << "  rhs.linfty=" << rhsInf << "  sol.linfty=" << solInf << endl;
+
+	if (rhsInf < 1.0e-6 && solInf < 1.0e-5) break;
+}
+
+// Save the results.
+string DataNameTh = "T u";
+int[int] OrderTh = [1, 1];
+savevtk("results/diffusionnonlinearsource.vtu", Th, T, u, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

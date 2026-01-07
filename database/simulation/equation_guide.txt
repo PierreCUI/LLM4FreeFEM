@@ -1,0 +1,63 @@
+Equation guidance. This document provides the guidances of some difficult equations.
+
+1. Viscous Term
+
+In some equations such as Navier Stokes, there exists a viscous term, normally written as -div(mu * sigma(v)), where mu > 0 and sigma(v) = (grad(v) + grad(v)^T) / 2. 
+
+1) The weak form of the the viscous term is: Int_Omega(mu * sigma(v) : grad(deltav)), where deltav is the test function of v.
+
+2) The residual form of the viscous term is: Int_Omega(mu * sigma(v) : grad(deltav)). We have:
+	P1) mu * sigma(v) : grad(deltav) = mu * sum_{i,j} sigma(v)_ij * d_j(deltav_i) = (mu/2) * sum_{i,j} ( d_j(v_i) + d_i(v_j) ) * d_j(deltav_i)
+	P2) i=x, j=x: (mu/2) * ( dx(vx) + dx(vx) ) * dx(deltavx) = mu * dx(vx) * dx(deltavx) = (mu/2) * 2.0 * dx(deltavx) * dx(vx)
+		i=x, j=y: (mu/2) * ( dy(vx) + dx(vy) ) * dy(deltavx) = (mu/2) * (dy(vx) + dx(vy)) * dy(deltavx)
+		i=y, j=x: (mu/2) * ( dx(vy) + dy(vx) ) * dx(deltavy) = (mu/2) * (dy(vx) + dx(vy)) * dx(deltavy) 
+		i=y, j=y: (mu/2) * ( dy(vy) + dy(vy) ) * dy(deltavy) = mu * dy(vy) * dy(deltavy) = (mu/2) * 2.0 * dy(deltavy) * dy(vy)
+	P3) Collect all terms: 	
+			For 2D:
+				0.5 * mu * (
+					  (dy(vx) + dx(vy)) * dy(deltavx)
+					+ (dy(vx) + dx(vy)) * dx(deltavy)
+					+ 2.0 * dx(deltavx) * dx(vx)
+					+ 2.0 * dy(deltavy) * dy(vy)
+				)
+		Similarly:
+			For 3D: 
+				0.5 * mu * (
+					  (dy(vx) + dx(vy)) * dy(deltavx) 
+					+ (dy(vx) + dx(vy)) * dx(deltavy) 
+					+ (dz(vx) + dx(vz)) * dz(deltavx) 
+					+ (dz(vx) + dx(vz)) * dx(deltavz) 
+					+ (dz(vy) + dy(vz)) * dz(deltavy) 
+					+ (dz(vy) + dy(vz)) * dy(deltavz) 
+					+ 2.0 * dx(deltavx) * dx(vx) 
+					+ 2.0 * dy(deltavy) * dy(vy) 
+					+ 2.0 * dz(deltavz) * dz(vz)
+				)
+
+3) The Newton form of the viscous term is: Int_Omega(mu * sigma(incv) : grad(deltav)), where incv is the incremental variable of v. We have:
+	P1) mu * sigma(incv) : grad(deltav) = mu * sum_{i,j} sigma(incv)_ij * d_j(deltav_i) = (mu/2) * sum_{i,j} ( d_j(incv_i) + d_i(incv_j) ) * d_j(deltav_i).
+	P2) i=x, j=x: (mu/2) * ( dx(incvx) + dx(incvx) ) * dx(deltavx) = (mu/2) * 2.0 * dx(deltavx) * dx(incvx)
+		i=x, j=y: (mu/2) * ( dy(incvx) + dx(incvy) ) * dy(deltavx) = (mu/2) * (dy(incvx) + dx(incvy)) * dy(deltavx)
+		i=y, j=x: (mu/2) * ( dx(incvy) + dy(incvx) ) * dx(deltavy) = (mu/2) * (dy(incvx) + dx(incvy)) * dx(deltavy)
+		i=y, j=y: (mu/2) * ( dy(incvy) + dy(incvy) ) * dy(deltavy) = (mu/2) * 2.0 * dy(deltavy) * dy(incvy)
+	P3) Collect all terms:
+			For 2D:
+				0.5 * mu * (
+					  (dy(incvx) + dx(incvy)) * dy(deltavx)
+					+ (dy(incvx) + dx(incvy)) * dx(deltavy)
+					+ 2.0 * dx(deltavx) * dx(incvx)
+					+ 2.0 * dy(deltavy) * dy(incvy)
+				)
+		Similarly:
+			For 3D: 
+				0.5 * mu * (
+					  (dy(incvx) + dx(incvy)) * dy(deltavx) 
+					+ (dy(incvx) + dx(incvy)) * dx(deltavy) 
+					+ (dz(incvx) + dx(incvz)) * dz(deltavx) 
+					+ (dz(incvx) + dx(incvz)) * dx(deltavz) 
+					+ (dz(incvy) + dy(incvz)) * dz(deltavy) 
+					+ (dz(incvy) + dy(incvz)) * dy(deltavz) 
+					+ 2.0 * dx(deltavx) * dx(incvx) 
+					+ 2.0 * dy(deltavy) * dy(incvy) 
+					+ 2.0 * dz(deltavz) * dz(incvz)
+				)

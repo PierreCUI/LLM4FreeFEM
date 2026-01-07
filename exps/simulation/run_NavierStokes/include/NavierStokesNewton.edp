@@ -1,0 +1,31 @@
+varf NavierStokesNewton([incvx,incvy,incvz,incp],[deltavx,deltavy,deltavz,deltap]) =
+  int3d(Th)(
+      rho*(
+          ( (incvx*dx(vx) + incvy*dy(vx) + incvz*dz(vx)) + (vx*dx(incvx) + vy*dy(incvx) + vz*dz(incvx)) )*deltavx
+        + ( (incvx*dx(vy) + incvy*dy(vy) + incvz*dz(vy)) + (vx*dx(incvy) + vy*dy(incvy) + vz*dz(incvy)) )*deltavy
+        + ( (incvx*dx(vz) + incvy*dy(vz) + incvz*dz(vz)) + (vx*dx(incvz) + vy*dy(incvz) + vz*dz(incvz)) )*deltavz
+      )
+
+    + mu*(
+          (dx(incvx))*(dx(deltavx))
+        + (dy(incvy))*(dy(deltavy))
+        + (dz(incvz))*(dz(deltavz))
+
+        + 2.0*(0.5*(dy(incvx)+dx(incvy)))*(0.5*(dy(deltavx)+dx(deltavy)))
+        + 2.0*(0.5*(dz(incvx)+dx(incvz)))*(0.5*(dz(deltavx)+dx(deltavz)))
+        + 2.0*(0.5*(dz(incvy)+dy(incvz)))*(0.5*(dz(deltavy)+dy(deltavz)))
+      )
+
+    - incp*(dx(deltavx)+dy(deltavy)+dz(deltavz))
+    + (-(dx(incvx)+dy(incvy)+dz(incvz)) + gamma*incp)*deltap
+  )
+  + on(1,incvx=0)
+  + on(1,incvy=0)
+  + on(1,incvz=0)
+  + on(3,incvx=0)
+  + on(3,incvy=0)
+  + on(3,incvz=0)
+  + on(4,incvx=0)
+  + on(4,incvy=0)
+  + on(4,incvz=0)
+;

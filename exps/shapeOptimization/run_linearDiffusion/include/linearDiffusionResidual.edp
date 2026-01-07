@@ -1,0 +1,3 @@
+varf linearDiffusionResidual([incu], [deltau]) =
+	int2d(Th)(lambda * chi(x, y) * (dx(u) * dx(deltau) + dy(u) * dy(deltau)) - f * deltau)
+	+ on(3, incu = 0);

@@ -1,0 +1,6 @@
+varf nonlinearDiffusionResidual([incu],[deltau])
+  = int2d(Th)(
+      ( lambda0/(1.0 + u^2) )*( dx(u)*dx(deltau) + dy(u)*dy(deltau) )
+    - 1.0*deltau
+    )
+  + on(4,incu=0);

@@ -1,0 +1,15 @@
+# Problem Description #
+
+This problem considers a stationary diffusion process on a spatial domain Omega. The objective is to compute the unknown field u(x).
+
+# Governing Equations #
+
+The process is governed by the partial differential equation: -div(lambda(u) * grad(u)) = 1 in Omega with lambda(u) = lambda0 / (1 + u^2). The problem is defined within 2 dimensions, thus x and y.
+
+Constants:
+	lambda0: constant diffusion parameter.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+	u = 0 on the boundary labeled as 4.

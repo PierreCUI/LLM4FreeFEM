@@ -1,0 +1,19 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+    - fluid density: rho = 1.0e+3,
+    - dynamic viscosity: mu = 1.0e-3,
+    - penalty parameter: gamma = 1.0e-9.
+
+2. Mesh
+The computational domain is defined by a circular boundary of radius 0.1, and it is discretized using nn2 = 25 segments. This circle boundary is assigned the label 0. A 3d mesh is built based on this boundary mesh directly with MaxLayer = 40 between zmin=0.0 and zmax=2.0, with bottom labeled as [0, 1] and top labeled as [0, 2], mid labeled as [0, 3]. The mesh is moved to [x+z^2*(zmax-z)^2, y, z] as initial position.
+
+3. Iteration Times
+The for loop should iterate from 0 until 40. Early stop if rhs.linfty is smaller than 1e-6 and sol.linfty is smaller than 1e-5.
+
+4. Initial field
+The initial speed is defined as 5e-2*(r^2-x^2-y^2)*(z<0.05) at vz, and 0 at vx and vy. The pressure is 0 at initial.
+
+5. Space
+v is defined within P2 space, p is defined within P1 space.

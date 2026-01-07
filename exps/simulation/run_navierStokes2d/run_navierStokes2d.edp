@@ -1,0 +1,69 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants.
+real rho = 1.0;
+real muT = 1.827e-2;
+real gamma = 1.0e-9;
+
+int n = 40;
+int maxIterSize = 40;
+
+// Define the mesh.
+mesh Th = square(n, n, [x, (0.1 + 0.1*x)*y + 4.0*x^2*(1.0-x)^2]);
+savemesh(Th, "meshInit.mesh");
+
+int mmgRes = system("mmg2d meshInit -hmax 0.0025");
+Th = readmesh("meshInit.o.mesh");
+
+// Define the FE spaces and mixed spaces.
+fespace VhV(Th, [P2, P2]);
+fespace VhP(Th, P1);
+
+fespace VhDeltaV(Th, [P2, P2]);
+fespace VhDeltaP(Th, P1);
+
+VhV [vx, vy] = [y*(y-0.1)*(x < 0.0005), 0.0];
+VhP p = 0.0;
+
+VhV [incVx, incVy];
+VhP incP;
+
+VhDeltaV [deltaVx, deltaVy];
+VhDeltaP deltaP;
+
+fespace Ch = <VhV*VhP>;
+fespace Cht = <VhDeltaV*VhDeltaP>;
+
+// Include the files from ./include folder.
+include "include/navierStokes2dNewton.edp"
+include "include/navierStokes2dResidual.edp"
+
+// Solve the problem.
+for (int i = 0; i < maxIterSize; i += 1)
+{
+	matrix A = navierStokes2dNewton(Ch, Cht);
+	set(A, solver=sparsesolver);
+
+	real[int] rhs = navierStokes2dResidual(0, Cht);
+	real[int] sol = A^-1 * rhs;
+
+	[incVx[], incP[]] = sol;
+
+	vx[] -= incVx[];
+	p[]  -= incP[];
+
+	cout << "Iter " << i << " | rhs.linfty=" << rhs.linfty << " | sol.linfty=" << sol.linfty << endl;
+
+	if ((rhs.linfty < 1.0e-6) && (sol.linfty < 1.0e-5)) break;
+}
+
+// Save the results.
+string DataNameTh = "vx vy p";
+int[int] OrderTh = [2, 2, 1];
+savevtk("results/navierStokes2d.vtu", Th, vx, vy, p, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

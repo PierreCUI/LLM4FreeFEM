@@ -1,0 +1,36 @@
+# Problem Description #
+
+This problem studies a steady-state vibro-acoustic interaction between a linear elastic solid domain Ths and a compressible acoustic fluid domain Thf. The objective is to compute the solid displacement field u(x) and the acoustic pressure field p(x). The formulation describes harmonic elastodynamics in the solid, acoustic wave propagation in the fluid, and coupling through the fluid-structure interface.
+
+# Governing Equations and Variables #
+
+The process is governed by the partial differential equations:
+	Frequency-domain elastic equilibrium equation: -omega^2 * rhos * u - div(sigma(u)) = 0 in Ths with sigma(u) = (E * nu / ((1 + nu) * (1 - 2 * nu))) * div(u) * I + (E / (2(1 + nu))) * epsilon(u) and epsilon(u) = (grad(u) + grad(u)^T) / 2.
+	Frequency-domain acoustic wave equation: -div(grad(p)) - omega^2 * (rhof / Kf) * p = 0 in Thf.
+
+The interface is governed by the partial differential equations:
+	Pressure-traction balance on Ths: sigma(u) . N = -p . N on Ths.
+	Normal flux/velocity coupling on Ths: dp/dn = rhof * (u . N) on Ths.
+
+The problem is defined within 2 dimensions, thus x and y.
+
+Constants:
+    E: Young's modulus,
+    nu: Poisson's ratio,
+    rhos: solid density,
+    rhof: fluid density,
+    Kf: fluid bulk modulus,
+    omega: angular frequency,
+	N = (N.x, N.y): unit outward normal vector on the interface.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+	Solid Dirichlet boundary: u = 0 on boundary labeled as 3,
+	Fluid Dirichlet boundary: p = 10 * x on boundary labeled as 2, 4,
+	Interface is labeled as 5.
+
+# Attention #
+
+1. The interface is only defined on Ths, not on Thf. Only the integration on Ths is allowed. It is strictly forbidden to integrate on Thf. For Thf, define the terms inversly, thus "MINUS" the a "symetric" integration defined on Ths.
+2. In this question, the mu corresponds to 2 * mu in the standard thermoelasticity formulation.

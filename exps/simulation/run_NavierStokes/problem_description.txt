@@ -1,0 +1,18 @@
+# Problem Description #
+
+This problem considers a steady incompressible viscous flow on a spatial domain Omega. The objective is to compute the unknown velocity field v(x) and the unknown pressure field p(x).
+
+# Governing Equations #
+
+The process is governed by the partial differential equations: rho * (v . grad(v)) - div(mu * sigma(v)) + grad(p) = 0 in Omega and -div(v) + gamma * p = 0 in Omega with sigma(v) = (grad(v) + grad(v)^T) / 2. The problem is defined within 3 dimensions, thus x, y, and z.
+
+Constants:
+	rho: fluid density,
+	mu: dynamic viscosity,
+	gamma: penalty parameter,
+	N: outward unit normal.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+	v = 0 on the boundary labeled as 1, 3, 4.

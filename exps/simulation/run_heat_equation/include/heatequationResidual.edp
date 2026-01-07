@@ -1,0 +1,3 @@
+varf heatequationResidual([incu],[deltau]) =
+  int2d(Th)( c*((u-uold)/timeStepSize)*deltau + k*(dx(u)*dx(deltau) + dy(u)*dy(deltau)) - f*deltau )
+  + on(1,incu=0);

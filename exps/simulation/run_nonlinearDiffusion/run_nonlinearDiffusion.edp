@@ -1,0 +1,53 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "iovtk";
+
+// Define all constants.
+real lambda0 = 10.0;
+int nn = 20;
+int maxIterSize = 40;
+real tolRhs = 1.0e-6;
+real tolSol = 1.0e-5;
+
+// Define the mesh.
+int[int] labels = [1, 2, 3, 4];
+mesh Th = square(nn, nn, label=labels);
+
+// Define the FE spaces.
+fespace VhU(Th, P1);
+fespace VhdeltaU(Th, P1);
+
+// Define fields, increments, and tests.
+VhU u = 0.0;
+VhU incu;
+VhdeltaU deltau;
+
+// Include the files from ./include folder.
+include "include/nonlinearDiffusionNewton.edp"
+include "include/nonlinearDiffusionResidual.edp"
+
+// Solve the problem.
+for (int i = 0; i < maxIterSize; i += 1)
+{
+	matrix A = nonlinearDiffusionNewton(VhU, VhdeltaU);
+	set(A, solver=sparsesolver);
+
+	real[int] rhs = nonlinearDiffusionResidual(0, VhdeltaU);
+	real[int] sol = A^-1 * rhs;
+
+	[incu[]] = sol;
+	u[] -= incu[];
+
+	cout << "Iter " << i << "  rhs.linfty = " << rhs.linfty << "  sol.linfty = " << sol.linfty << endl;
+
+	if ((rhs.linfty < tolRhs) && (sol.linfty < tolSol)) { break; }
+}
+
+// Save the results.
+string dataNameTh = "u";
+int[int] orderTh = [1];
+savevtk("results/nonlinearDiffusion2d.vtu", Th, u, dataname=dataNameTh, order=orderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;

@@ -1,0 +1,16 @@
+# This is a document to provide extra information for the training process #
+
+1. Constant Values
+The following scalar constants are defined in the script:
+	- diffusion coefficient k = 1,
+	- heat inertia: c = 3,
+	- source term amplitude f = 4.
+
+2. Mesh
+The computational domain is a unit square divided into a regular grid with nn = 20 and is labeled as [1, 2, 3, 4].
+
+3. Iteration Times
+The for loop should iterate from 0 until finalTime = 10, with a step size of timeStepSize = 0.1.
+
+4. Space
+u is defined within P1 space.

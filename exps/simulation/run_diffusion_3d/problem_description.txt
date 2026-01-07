@@ -1,0 +1,16 @@
+# Problem Description #
+
+This problem studies a steady-state diffusion heat conduction process defined over a spatial domain Omega. The objective is to compute the spatial distribution of an unknown field T(x).
+
+# Governing Equation and Variables #
+
+The process is governed by the partial differential equation: -div(k * grad(T)) = f in Omega. The problem is defined within 3 dimensions, thus x, y, and z.
+
+Constants:
+	k: diffusion coefficient,
+	f: volumetric source term.
+
+# Boundary Conditions #
+
+Dirichlet boundary:
+	T = 0 on boundary labeled as 5.

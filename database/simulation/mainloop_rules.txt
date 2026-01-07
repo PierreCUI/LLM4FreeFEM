@@ -1,0 +1,5 @@
+1. You don't add any prefix or suffix for the code. You only use "//" for the comments, not "#" or other symbols.
+2. The code of the equations are designed to be used directly. You must include them directly in your code.
+3. Your code should be workable with the equations, considering the name of the variables, the way they are defined, etc..
+4. It is strictly forbidden to use "_" in FreeFEM. Always use Camel Case to name the variables and functions.
+5. Please write 1.0 instead 1. and so on. You should write this in complete form.

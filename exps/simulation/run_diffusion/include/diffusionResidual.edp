@@ -1,0 +1,1 @@
+varf diffusionResidual([incT],[deltaT]) = int2d(Th)( k*( dx(T)*dx(deltaT) + dy(T)*dy(deltaT) ) - f*deltaT ) + on(1,incT=0);

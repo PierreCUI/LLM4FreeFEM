@@ -1,0 +1,62 @@
+// Start time record.
+real timeStart = clock();
+
+// Load necessary packages.
+load "msh3";
+load "tetgen";
+load "iovtk";
+
+// Define all constants of the program.
+real k = 1.0;
+real f = 4.0;
+
+int level = 2;
+int nn2 = 6 * (2^level);
+int maxLayer = (2^level);
+real zmin = 0.0;
+real zmax = 2.0;
+
+real cx = 0.5;
+real cy = 0.5;
+real r0 = 0.3;
+
+// Define the mesh.
+border holeBoundary(t=0.0, 2.0*pi)
+{
+	x = cx + r0*cos(t);
+	y = cy + r0*sin(t);
+	label = 4;
+}
+
+mesh th2 = buildmesh(holeBoundary(nn2));
+mesh3 Th = buildlayers(th2, maxLayer, zbound=[zmin, zmax], labeldown=[0,6], labelup=[0,5]);
+
+// Define the FE spaces.
+fespace VhT(Th, P1);
+fespace VhdeltaT(Th, P1);
+
+VhT T = 0.0;
+VhT incT;
+
+VhdeltaT deltaT;
+
+// Include the files from ./include folder.
+include "include/diffusion3dNewton.edp"
+include "include/diffusion3dResidual.edp"
+
+// Solve the problem (single linear solve).
+matrix A = diffusion3dNewton(VhT, VhdeltaT);
+set(A, solver=sparsesolver);
+
+real[int] rhs = diffusion3dResidual(0, VhdeltaT);
+real[int] sol = A^-1 * rhs;
+
+[incT[]] = sol;
+T[] -= incT[];
+
+// Save the results.
+string DataNameTh = "T";
+int[int] OrderTh = [1];
+savevtk("results/diffusion3dT.vtu", Th, T, dataname=DataNameTh, order=OrderTh);
+
+cout << "Total Runtime:" << clock() - timeStart << endl;
