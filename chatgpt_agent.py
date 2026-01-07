@@ -78,11 +78,11 @@ for problem_name in problems_name:
     # problem_type = problem_classification(agent, folder)["ProblemType"]
     # time.sleep(1)
 
-    # generate_formulas_interface(agent, "simulation", problem_name)  # Debug
-    # time.sleep(1)
+    generate_formulas_interface(agent, "simulation", problem_name)  # Debug
+    time.sleep(1)
 
-    # generate_mainloop_interface(agent, "simulation", problem_name)  # Debug
-    # time.sleep(1)
+    generate_mainloop_interface(agent, "simulation", problem_name)  # Debug
+    time.sleep(1)
 
     index = 0
     while True:
@@ -94,8 +94,13 @@ for problem_name in problems_name:
             text=True,
         )
         if "Normal End" not in result_output.stdout:
-            if index < max_index:
+            if index < max_index and index % 2 == 1:
                 generate_polish_interface(agent, "simulation", problem_name, result_output.stdout)  # Debug
+                time.sleep(1)
+            elif index < max_index and index % 2 == 0:
+                generate_formulas_interface(agent, "simulation", problem_name)  # Debug
+                time.sleep(1)
+                generate_mainloop_interface(agent, "simulation", problem_name)  # Debug
                 time.sleep(1)
             else:
                 print(rf"ERROR: {problem_name} is not accomplished within the given times!")

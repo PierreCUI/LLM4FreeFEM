@@ -16,7 +16,7 @@ Build the mixed space(s) if multiple fields are provided. The mixed space(s) are
 Give initial values for each variable in the field(s) directly in the following way. For example,
 	- VhX [Xx, Xy, Xz] = [..., ..., ...]  // For vector, ... are values
 	- VhY Y = ...  // For scalar, ... is a value
-Attention: It is not allowed to initial the values independantly by Xx = value or Y = initialValue. This is not allowed by the FreeFEM grammar. Their values must be given in the above way.
+Attention: It is not allowed to initial the values independently by Xx = value or Y = initialValue. This is not allowed by the FreeFEM grammar. Their values must be given in the above way.
 
 # Step 4 #
 Give incremental variable(s) for each field. For example,
